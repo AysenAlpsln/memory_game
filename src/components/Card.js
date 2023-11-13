@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addScore, deleteScore } from '../redux/cardSlice';
 
 function Card() {
 
   const frameworks = useSelector(state => state.cards.frameworks);
+  const dispatch = useDispatch();
 
   function shuffleFramework(frameworks) {
     let randomFrameworks = [];
@@ -24,9 +26,6 @@ function Card() {
   }
   const [randomized, setRandomized] = useState(shuffleFramework(frameworks));
   const [compareCard, setCompareCard] = useState([]);
-
-  console.log(randomized)
-  console.log(compareCard)
 
 
   const handleChangeFace = (index) => {
@@ -49,6 +48,7 @@ function Card() {
           card.name === compareCard[0].name ? { ...card, matched: true } : card
         ));
         setCompareCard([]);
+        dispatch(addScore(50));
       }
       else {
         setTimeout(() => {
@@ -56,6 +56,7 @@ function Card() {
             ({ ...card, close: true })
           ));
           setCompareCard([]);
+          dispatch(deleteScore(10))
         }, 1000);
       }
     }
