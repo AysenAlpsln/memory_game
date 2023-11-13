@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 function Card() {
@@ -23,19 +23,42 @@ function Card() {
     return randomFrameworks;
   }
   const [randomized, setRandomized] = useState(shuffleFramework(frameworks));
-  const [openCount, setOpenCount] = useState(0);
+  const [compareCard, setCompareCard] = useState([]);
 
   console.log(randomized)
+  console.log(compareCard)
 
 
   const handleChangeFace = (index) => {
-    if(openCount < 2) {
+    if(compareCard.length < 2) {
       setRandomized(randomized.map((card,i) => 
         i === index ? { ...card, close: false } : card
       ));
+      setCompareCard((openCard) => [...openCard, randomized[index]]);
     }
-    setOpenCount(openCount+1);
-    
+  }
+
+  useEffect(() => {
+    compareCards();
+  }, [compareCard]);
+
+  const compareCards = () => {
+    if(compareCard.length === 2) {
+      if(compareCard[0].name === compareCard[1].name) {
+        setRandomized(randomized.map((card) => 
+          card.name === compareCard[0].name ? { ...card, matched: true } : card
+        ));
+        setCompareCard([]);
+      }
+      else {
+        setTimeout(() => {
+          setRandomized(randomized.map((card) =>
+            ({ ...card, close: true })
+          ));
+          setCompareCard([]);
+        }, 1000);
+      }
+    }
   }
 
   return (
@@ -43,7 +66,7 @@ function Card() {
       <div className='card_container'>
         {
           randomized.map((framework, index) => (
-            <div key={index} className={"card" + (!framework.close ? ' opened' : '')} onClick={() => handleChangeFace(index)}>
+            <div key={index} className={"card" + (!framework.close ? ' opened' : '') + (framework.matched ? ' matched' : '')} onClick={() => handleChangeFace(index)}>
               <div className='front'>
                 ?
               </div>
